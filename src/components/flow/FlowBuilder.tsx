@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -34,8 +34,17 @@ export const FlowBuilder = ({
   onEdgesChange,
   isReadOnly = false 
 }: FlowBuilderProps) => {
-  const [nodes, setNodes, onReactFlowNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onReactFlowEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onReactFlowNodesChange] = useNodesState([]);
+  const [edges, setEdges, onReactFlowEdgesChange] = useEdgesState([]);
+
+  // Sync external nodes/edges with internal state
+  useEffect(() => {
+    setNodes(initialNodes);
+  }, [initialNodes, setNodes]);
+
+  useEffect(() => {
+    setEdges(initialEdges);
+  }, [initialEdges, setEdges]);
 
   const nodeTypes: NodeTypes = useMemo(() => ({
     connect: ConnectNode,
@@ -59,21 +68,20 @@ export const FlowBuilder = ({
 
   const handleNodesChange = useCallback((changes: any) => {
     onReactFlowNodesChange(changes);
-    // Update parent component with current nodes
-    setNodes((currentNodes) => {
-      onNodesChange(currentNodes);
-      return currentNodes;
-    });
-  }, [onReactFlowNodesChange, setNodes, onNodesChange]);
+  }, [onReactFlowNodesChange]);
 
   const handleEdgesChange = useCallback((changes: any) => {
     onReactFlowEdgesChange(changes);
-    // Update parent component with current edges
-    setEdges((currentEdges) => {
-      onEdgesChange(currentEdges);
-      return currentEdges;
-    });
-  }, [onReactFlowEdgesChange, setEdges, onEdgesChange]);
+  }, [onReactFlowEdgesChange]);
+
+  // Update parent when internal state changes
+  useEffect(() => {
+    onNodesChange(nodes);
+  }, [nodes, onNodesChange]);
+
+  useEffect(() => {
+    onEdgesChange(edges);
+  }, [edges, onEdgesChange]);
 
   const handleDataChange = useCallback((nodeId: string, newData: any) => {
     setNodes((nds) =>
