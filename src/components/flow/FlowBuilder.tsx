@@ -93,32 +93,63 @@ export const FlowBuilder = ({
     );
   }, [setNodes]);
 
-  // Add data change handler to all nodes
-  const enhancedNodes = useMemo(() => 
-    nodes.map((node) => ({
+  const handleDeleteNode = useCallback((nodeId: string) => {
+    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+    setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+  }, [setNodes, setEdges]);
+
+  // Calculate ordered positioning for nodes
+  const getOrderedNodes = useCallback((nodeList: CampaignNode[]) => {
+    return nodeList.map((node, index) => ({
       ...node,
+      position: {
+        x: 100,
+        y: index * 200 + 100
+      },
       data: {
         ...node.data,
+        order: index + 1,
         onDataChange: handleDataChange,
+        onDelete: handleDeleteNode,
       },
-    })),
-    [nodes, handleDataChange]
-  );
+    }));
+  }, [handleDataChange, handleDeleteNode]);
+
+  // Auto-generate ordered edges between consecutive nodes
+  const getOrderedEdges = useCallback((nodeList: CampaignNode[]) => {
+    const orderedEdges: CampaignEdge[] = [];
+    for (let i = 0; i < nodeList.length - 1; i++) {
+      orderedEdges.push({
+        id: `edge-${nodeList[i].id}-${nodeList[i + 1].id}`,
+        source: nodeList[i].id,
+        target: nodeList[i + 1].id,
+        type: 'smoothstep',
+      });
+    }
+    return orderedEdges;
+  }, []);
+
+  // Get enhanced nodes with proper ordering and callbacks
+  const enhancedNodes = useMemo(() => getOrderedNodes(nodes), [nodes, getOrderedNodes]);
+  
+  // Get auto-generated edges for sequential flow
+  const autoEdges = useMemo(() => getOrderedEdges(nodes), [nodes, getOrderedEdges]);
 
   return (
     <div className="w-full h-[600px] border rounded-lg bg-background">
       <ReactFlow
         nodes={enhancedNodes}
-        edges={edges}
+        edges={autoEdges}
         onNodesChange={handleNodesChange}
         onEdgesChange={handleEdgesChange}
-        onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
         className="bg-background"
-        nodesDraggable={!isReadOnly}
-        nodesConnectable={!isReadOnly}
+        nodesDraggable={false}
+        nodesConnectable={false}
         elementsSelectable={!isReadOnly}
+        panOnDrag={true}
+        zoomOnScroll={true}
       >
         <Background />
         <Controls />

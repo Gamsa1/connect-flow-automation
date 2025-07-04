@@ -6,7 +6,11 @@ export interface CampaignNode {
     label?: string;
     message?: string;
     delay?: number;
+    unit?: string;
     connectMessage?: string;
+    order?: number;
+    onDataChange?: (nodeId: string, newData: any) => void;
+    onDelete?: (nodeId: string) => void;
   };
 }
 
