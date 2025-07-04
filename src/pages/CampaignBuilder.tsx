@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FlowBuilder } from "@/components/flow/FlowBuilder";
+import { OrderedFlowBuilder } from "@/components/flow/OrderedFlowBuilder";
 import { storageService } from "@/lib/storage";
 import { Campaign, CampaignNode, CampaignEdge, ACCOUNT_OPTIONS } from "@/types/campaign";
 import { useToast } from "@/hooks/use-toast";
@@ -26,10 +26,7 @@ export default function CampaignBuilder() {
     const newNode: CampaignNode = {
       id,
       type,
-      position: { 
-        x: Math.random() * 500 + 100, 
-        y: Math.random() * 300 + 100 
-      },
+      position: { x: 0, y: 0 }, // Not used in ordered layout
       data: {
         label: type.charAt(0).toUpperCase() + type.slice(1),
       },
@@ -193,12 +190,10 @@ export default function CampaignBuilder() {
               </p>
             </CardHeader>
             <CardContent>
-              <FlowBuilder
-                nodes={nodes}
-                edges={edges}
-                onNodesChange={setNodes}
-                onEdgesChange={setEdges}
-              />
+            <OrderedFlowBuilder
+              nodes={nodes}
+              onNodesChange={setNodes}
+            />
             </CardContent>
           </Card>
         </div>
