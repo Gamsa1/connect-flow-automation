@@ -3,7 +3,6 @@ import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   addEdge,
@@ -153,17 +152,6 @@ export const FlowBuilder = ({
       >
         <Background />
         <Controls />
-        <MiniMap 
-          className="bg-card border"
-          nodeColor={(node) => {
-            switch (node.type) {
-              case 'connect': return 'hsl(var(--flow-connect))';
-              case 'message': return 'hsl(var(--flow-message))';
-              case 'delay': return 'hsl(var(--flow-delay))';
-              default: return 'hsl(var(--muted))';
-            }
-          }}
-        />
       </ReactFlow>
     </div>
   );
