@@ -42,6 +42,12 @@ export const Header = () => {
                   New Campaign
                 </Button>
               </Link>
+              <Button 
+                variant="outline"
+                size="sm"
+              >
+                Connect Account
+              </Button>
             </nav>
           </div>
           <div className="text-lg font-semibold text-muted-foreground">
